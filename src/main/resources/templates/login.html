@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <link th:href="@{/css/style.css}" rel="styleSheet">
+    <title>ログイン画面</title>
+</head>
+<body>
+<div class="header-contents">
+    <h2>ログイン画面</h2>
+</div>
+<div class="main-contents">
+    <form method="post" action="/login" th:object="${formModel}">
+        <div th:if="${errorMessage}" style="color: red; font-weight: bold; margin-bottom: 10px;">
+            <p th:text="${errorMessage}"></p>
+        </div>
+        <div th:if="${#fields.hasErrors('account')}"
+             th:errors="*{account}" style="color: red; font-weight: bold; margin-top: 5px;">
+        </div>
+        <div th:if="${#fields.hasErrors('password')}"
+             th:errors="*{password}" style="color: red; font-weight: bold; margin-top: 5px;">
+        </div>
+        <div class="form-area">
+            <label>アカウント</label><br>
+            <input type="text" id="account" name="account" maxlength="20" th:field="*{account}"><br>
+            <label>パスワード</label><br>
+            <input type="password" class="password" th:field="*{password}"><br>
+            <input type="submit" value="ログイン" />
+        </div>
+    </form>
+</div>
+<div class="footer-contents">
+</div>
+</body>
+</html>
