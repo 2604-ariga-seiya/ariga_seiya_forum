@@ -1,0 +1,16 @@
+/* 1つの塊（投稿＋返信）をカード型にして、下に隙間をあける */
+.post-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    background-color: #fff;
+}
+
+/* ついでに返信コメントの塊も、ちょっと左側に線を引いておくと「返信感」が出ます */
+.comment-item {
+    border-left: 2px solid #ccc;
+    padding-left: 10px;
+    margin-top: 10px;
+    background-color: #f9f9f9;
+}

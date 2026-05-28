@@ -12,7 +12,7 @@
 <div class="main-contents">
     <form method="post" action="/login" th:object="${formModel}">
         <div th:if="${errorMessage}" style="color: red; font-weight: bold; margin-bottom: 10px;">
-            <p th:text="${errorMessage}"></p>
+            <p th:text="#{${errorMessage}}"></p>
         </div>
         <div th:if="${#fields.hasErrors('account')}"
              th:errors="*{account}" style="color: red; font-weight: bold; margin-top: 5px;">
