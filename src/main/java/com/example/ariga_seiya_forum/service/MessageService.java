@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,9 +24,9 @@ public class MessageService {
     @Autowired
     MessageRepository messageRepository;
 
-    public List<MessageForm> findAllMessages(String startStr, String endStr){
+    public List<MessageForm> findAllMessages(){
 
-        LocalDateTime start = LocalDateTime.of(1970, 1, 1, 0, 0);
+        LocalDateTime start = LocalDateTime.of(2022, 1, 1, 0, 0,0);
         LocalDateTime end = LocalDateTime.now();
 
         Pageable pageable = PageRequest.of(0, PAGE_SIZE, Sort.by("createdDate").descending());
@@ -66,7 +67,38 @@ public class MessageService {
     }
 
     public List<MessageForm> findByCategorize(String startStr, String endStr, String category){
-        
-    }
 
+
+        log.info("[MessageService] Starting search - StartStr: '{}', EndStr: '{}', Category: '{}'",
+               startStr, endStr, category);
+
+        LocalDateTime start;
+        if (startStr == null || startStr.isBlank()) {
+            start = LocalDateTime.of(2022, 1, 1, 0, 0, 0);
+        } else {
+            // 文字列を一度LocalDateとして解析し、一日の始まり（00:00:00）を結合する
+            start = LocalDate.parse(startStr).atStartOfDay();
+        }
+
+        LocalDateTime end;
+        if (endStr == null || endStr.isBlank()) {
+            end = LocalDateTime.now();
+        } else {
+            // 文字列を一度LocalDateとして解析し、一日の終わり（23:59:59）を結合する
+            end = LocalDate.parse(endStr).atTime(23, 59, 59);
+        }
+
+        Pageable pageable = PageRequest.of(0, PAGE_SIZE, Sort.by("createdDate").descending());
+        List<Message> results;
+
+        if (category == null || category.isBlank()) {
+            results = messageRepository.findAllByCreatedDateBetween(start, end, pageable);
+        } else {
+            results = messageRepository.findAllByCreatedDateBetweenAndCategory(start, end, category, pageable);
+        }
+
+        log.info("[MessageService] Found {} message for display.", results.size());
+
+        return setMessageForm(results);
+    }
 }

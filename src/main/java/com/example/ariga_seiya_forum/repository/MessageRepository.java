@@ -11,6 +11,6 @@ public interface MessageRepository extends JpaRepository<Message, Integer> {
 
     List<Message> findAllByCreatedDateBetween(LocalDateTime start, LocalDateTime end, Pageable pageable);
 
-    List<Message> findAllByCreatedDateBetweenAndCategory(LocalDateTime start, LocalDateTime end, Integer categoryId, Pageable pageable);
+    List<Message> findAllByCreatedDateBetweenAndCategory(LocalDateTime start, LocalDateTime end, String category, Pageable pageable);
 }
 

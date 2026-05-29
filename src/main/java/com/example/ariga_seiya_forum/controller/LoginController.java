@@ -73,7 +73,7 @@ public class LoginController {
             session.setAttribute("loginUser", loginUser);
 
             log.info("[LoginController] Login successful. Saved user to session. Redirecting to home page for account: {}.", loginForm.getAccount());
-            mav.setViewName("redirect:/home");
+            mav.setViewName("redirect:/top");
 
         } catch (BadCredentialsException | DisabledException e) {
             log.warn("[LoginController] Login failed for account: {}. Reason: {}", loginForm.getAccount(), e.getMessage());

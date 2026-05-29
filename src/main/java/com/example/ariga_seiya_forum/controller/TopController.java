@@ -36,7 +36,7 @@ public class TopController {
 
         mav.addObject("loginUser", loginUser);
 
-        List<MessageForm> messageList = messageService.findAllMessages(null, null);
+        List<MessageForm> messageList = messageService.findAllMessages();
 
         List<CommentForm> commentList = commentService.findAllComments(messageList);
 
@@ -46,33 +46,58 @@ public class TopController {
         mav.addObject("messages", messageList);
         mav.addObject("comments", commentList);
 
+        String bindingResultKey = org.springframework.validation.BindingResult.MODEL_KEY_PREFIX + "commentForm";
+
+        if (session.getAttribute(bindingResultKey) != null) {
+            mav.addObject(bindingResultKey, session.getAttribute(bindingResultKey));
+            mav.addObject("commentForm", session.getAttribute("commentForm"));
+
+            // 一度画面に渡したらセッションから削除する
+            session.removeAttribute(bindingResultKey);
+            session.removeAttribute("commentForm");
+        } else {
+            // 通常アクセス時は、エラー情報の入っていない綺麗な空のフォームを置く
+            mav.addObject("commentForm", new CommentForm());
+        }
+
+        if (session.getAttribute("errorMessage") != null) {
+            mav.addObject("errorMessage", session.getAttribute("errorMessage"));
+            session.removeAttribute("errorMessage");
+        }
+
         return mav;
     }
 
     @GetMapping("/search")
-    public ModelAndView Categorize(
-        @RequestParam(name = "startDate", required = false) String startStr,
-        @RequestParam(name = "endDate", required = false) String endStr,
-        @RequestParam(name = "category", required = false) String category){
+    public ModelAndView categorize(
+            @RequestParam(name = "startDate", required = false) String startStr,
+            @RequestParam(name = "endDate", required = false) String endStr,
+            @RequestParam(name = "category", required = false) String category){
 
         log.info("[TopController] Received request to search. start: {}, end: {}, category: {}", startStr, endStr, category);
 
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/top"); // 遷移先はトップ画面
-
-        mav.addObject("startDate", startStr);
-        mav.addObject("endDate", endStr);
+        List<MessageForm> messageList;
 
         try {
-            List<MessageForm> messageList = messageService.findByCategorize(startStr, endStr, category);
-            mav.addObject("messages", messageList);
-
-        }catch(DateTimeParseException e){
+            messageList = messageService.findByCategorize(startStr, endStr, category);
+        } catch (DateTimeParseException e) {
             log.warn("[TopController] Invalid date format submitted: {}", e.getMessage());
-            mav.addObject("errorMessage", "不正なパラメータです。");
+            mav.addObject("errorMessage", "E0025");
 
-            mav.addObject("messages", messageService.findAllMessages(null, null));
+            // エラー時は安全のために全件取得にする
+            messageList = messageService.findAllMessages();
         }
+
+        List<CommentForm> commentList = commentService.findAllComments(messageList);
+
+        //画面（View）とデータのセット
+        mav.setViewName("top");
+        mav.addObject("startDate", startStr);
+        mav.addObject("endDate", endStr);
+        mav.addObject("category", category);
+        mav.addObject("messages", messageList);
+        mav.addObject("comments", commentList);
 
         return mav;
     }

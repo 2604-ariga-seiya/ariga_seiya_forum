@@ -7,7 +7,18 @@
 </head>
 <body>
 <h2>掲示板</h2>
-<form th:action="@{./}" method="get">
+
+<div class="comment-error-area" style="color: red; font-weight: bold; margin-bottom: 10px;">
+
+    <th:block th:if="${#fields != null and #fields.hasErrors('commentForm.content')}">
+        <p th:text="${#fields.errors('commentForm.content')[0]}"></p>
+    </th:block>
+
+    <p th:if="${errorMessage}" th:text="#{${errorMessage}}"></p>
+
+</div>
+
+<form th:action="@{/search}" method="get">
     <div class="filter-area">
         <label for="startDate">期間:</label>
         <input type="date" id="startDate" name="startDate" th:value="${startDate}">
@@ -70,22 +81,36 @@
 
             <form th:action="@{/comment}" method="post">
                 返信<br />
-                <textarea name="text" cols="100" rows="5" class="tweet-box"></textarea>
+                <textarea name="content" cols="100" rows="5" class="comment"></textarea>
                 <br />
-                <input type="hidden" name="message_id" th:value="${message.id}">
+                <input type="hidden" name="messageId" th:value="${message.id}">
                 <input type="submit" value="返信">
             </form>
 
             <th:block th:each="comment : ${comments}">
                 <div class="comment-item" th:if="${comment.messageId == message.id}">
-                <span class="comment-account-name">
-                    <a th:href="@{./(user_id=${comment.userId})}" th:text="${comment.account}">コメントアカウント</a>
-                </span>
+                    <span class="comment-account-name">
+                        <a th:href="@{./(user_id=${comment.userId})}" th:text="${comment.account}">コメントアカウント</a>
+                    </span>
                     <span class="name" th:text="${comment.name}">コメント名前</span>
                     <div class="comment-text" th:text="${comment.content}">コメント内容</div>
                     <div class="comment-date" th:text="${#temporals.format(comment.createdDate, 'yyyy/MM/dd HH:mm:ss')}"></div>
+
+                    <div style="background-color: #f0f0f0; color: blue; font-size: 11px; padding: 5px; margin-top: 5px; border-radius: 3px;">
+                        🔑 あなたのログインID: <span th:text="${loginUser?.id}"></span> (型: <span th:text="${loginUser?.id?.getClass()?.getSimpleName()}"></span>) <br>
+                        📝 このコメントの投稿者ID: <span th:text="${comment.userId}"></span> (型: <span th:text="${comment.userId?.getClass()?.getSimpleName()}"></span>)
+                    </div>
+
+                    <th:block th:if="${loginUser != null and loginUser.id == comment.userId}">
+                        <form th:action="@{/comment/delete/{id}(id=${comment.id})}" th:method="delete" style="display: inline;">
+                            <input type="hidden" name="comment_id" th:value="${comment.id}">
+                            <button type="submit" class="delete-button">削除</button>
+                        </form>
+                    </th:block>
+
                 </div>
             </th:block>
+
 
         </article>
     </div>
