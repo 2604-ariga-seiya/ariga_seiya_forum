@@ -101,4 +101,67 @@ public class MessageService {
 
         return setMessageForm(results);
     }
+
+    /*
+     * 保存処理（新規登録・更新）
+     */
+    public void saveMessage(MessageForm reqMessage) {
+
+        log.info("[MessageService] Creating new message - Content: {}", reqMessage.getContent());
+
+        // Entityへの変換
+        Message saveMessage = setMessageEntity(reqMessage);
+
+        // DBへの保存実行
+        messageRepository.save(saveMessage);
+
+        // 2. 正常終了を記録
+        log.info("[ReportService] Message save operation completed successfully.");
+    }
+
+    /*
+     * リクエストから取得した情報をEntityに設定
+     */
+    private Message setMessageEntity(MessageForm reqMessage){
+        log.info("[MessageService] Converting Form to Entity - ID: {}", reqMessage.getId());
+
+        Message message = new Message();
+        message.setUserId(reqMessage.getUserId());
+        message.setContent(reqMessage.getContent());
+        message.setCategory(reqMessage.getCategory());
+        message.setTitle(reqMessage.getTitle());
+        return message;
+    }
+
+    public void deleteMessage(int id) {
+        log.warn("[MessageService] Executing delete - MessageID: {}", id);
+
+        messageRepository.deleteById(id);
+
+        log.info("[MessageService] Delete completed successfully - MessageID: {}", id);
+
+    }
+
+    /*
+     * 投稿を1件取得
+     */
+    public MessageForm findMessageById(Integer id) {
+
+        log.info("[MessageService] Attempting to find message by ID: {}", id);
+
+        List<Message> results = new ArrayList<>();
+        Message message = messageRepository.findById(id).orElse(null);
+
+        if (message == null) {
+            log.warn("[MessageService] Message not found - MessageID: {}", id);
+            return null;
+        }
+
+        log.info("[MessageService] Message successfully retrieved from database. Title: {}", message.getTitle());
+
+        results.add(message);
+        List<MessageForm> messagList = setMessageForm(results);
+
+        return messagList.get(0);
+    }
 }

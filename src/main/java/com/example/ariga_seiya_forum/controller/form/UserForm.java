@@ -15,4 +15,6 @@ public class UserForm {
     private Integer isStopped;
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
+    private String branchName;
+    private String departmentName;
 }

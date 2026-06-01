@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link th:href="@{/css/style.css}" rel="styleSheet">
+    <title>ユーザー管理画面</title>
+</head>
+<body>
+
+<div class="header-contents">
+    <h1>ユーザー管理画面</h1>
+
+    <div th:if="${errorMessage}" class="alert alert-danger" style="color: red; font-weight: bold;">
+        <p th:text="${errorMessage}"></p>
+    </div>
+
+    <div class="header">
+        <th:block th:if="${loginUser != null}">
+            <a th:href="@{/register/user}">ユーザー登録画面</a>
+            <a th:href="@{/edit/user}">ユーザー編集画面</a>
+            <a href="/top">戻る</a>
+        </th:block>
+    </div>
+</div>
+<div class="main-contents">
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>アカウント</th>
+            <th>名前</th>
+            <th>支店ID</th>
+            <th>部署ID</th>
+            <th>状態</th>
+            <th>支店名</th>
+            <th>部署名</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="user : ${userList}">
+            <td th:text="${user.id}"></td>
+            <td th:text="${user.account}"></td>
+            <td th:text="${user.name}"></td>
+            <td th:text="${user.branchId}"></td>
+            <td th:text="${user.departmentId}"></td>
+            <td th:text="${user.isStopped == 1 ? '停止中' : '稼働中'}"></td>
+            <td th:text="${user.branchName}"></td>
+            <td th:text="${user.departmentName}"></td>
+
+            <td>
+                <form th:if="${user.isStopped == 1}" th:action="@{/user/revive/{id}(id=${user.id})}" method="POST"
+                      onsubmit="return confirm('このユーザーを復活してもよろしいですか？');" style="display: inline;">
+                    <button type="submit" class="btn-revive">復活</button>
+                </form>
+
+                <form th:if="${user.isStopped == 0}" th:action="@{/user/stop/{id}(id=${user.id})}" th:method="POST"
+                      onsubmit="return confirm('このユーザーを停止してもよろしいですか？');" style="display: inline;">
+                    <button type="submit" class="btn-suspend">停止</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>

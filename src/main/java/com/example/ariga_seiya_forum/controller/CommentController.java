@@ -69,17 +69,20 @@ public class CommentController {
         return mav;
     }
 
-
     /*
      * 返信削除処理
      */
-    @DeleteMapping("/deleteComment/{id}")
-    public String deleteComment(@PathVariable int id) {
+    @DeleteMapping("/comment/delete/{id}")
+    public ModelAndView deleteComment(@PathVariable int id) {
         log.info("[CommentController] Received request to delete comment - ID: {}", id);
+
+        ModelAndView mav = new ModelAndView();
 
         commentService.deleteComment(id);
 
         log.info("[CommentController] Comment deletion successful - ID: {}", id);
-        return "redirect:/";
+
+        mav.setViewName("redirect:/top");
+        return mav;
     }
 }

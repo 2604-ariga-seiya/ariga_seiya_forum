@@ -7,37 +7,19 @@ import java.time.LocalDateTime;
 
 @Entity
 @Data
-@Table(name = "posts")
-public class Message {
+@Table(name = "departments")
+public class Department {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false)
-    private String title;
-
-    @Column(nullable = false)
-    private String content;
-
-    @Column(nullable = false)
-    private String category;
+    @Column(nullable = false, length = 50, unique = true)
+    private String name;
 
     @Column(name = "created_date", nullable = false, insertable = false, updatable = false)
     private LocalDateTime createdDate;
 
     @Column(name = "updated_date", nullable = false, insertable = false, updatable = false)
     private LocalDateTime updatedDate;
-
-    @Column(name = "user_id")
-    private Integer userId;
-
-    @ManyToOne
-    @JoinColumn(
-            name = "user_id",
-            referencedColumnName = "id",
-            insertable = false,
-            updatable = false
-    )
-    private User user;
 }

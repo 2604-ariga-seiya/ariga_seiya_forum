@@ -23,10 +23,10 @@ public class User {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @Column(name = "branch_id", nullable = false)
     private Integer branchId;
 
-    @Column(nullable = false)
+    @Column(name = "department_id", nullable = false)
     private Integer departmentId;
 
     @Column(nullable = false)
@@ -37,4 +37,22 @@ public class User {
 
     @Column(name = "updated_date", nullable = false, insertable = false, updatable = false)
     private LocalDateTime updatedDate;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(
+            name = "branch_id",
+            referencedColumnName = "id",
+            insertable = false,
+            updatable = false
+    )
+    private Branch branch;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(
+            name = "department_id",
+            referencedColumnName = "id",
+            insertable = false,
+            updatable = false
+    )
+    private Department department;
 }

@@ -41,13 +41,19 @@
 </div>
 
 <div class="main-contents">
+
     <div class="header">
         <th:block th:if="${loginUser != null}">
-            <a th:href="@{./}">ホーム</a>
-            <a th:href="@{/setting}">設定</a>
+            <a th:if="${loginUser.id == 1}" th:href="@{/user/management}">ユーザー管理画面</a>
             <a th:href="@{/logout}">ログアウト</a>
         </th:block>
     </div>
+
+    <th:block th:if="${loginUser != null}">
+        <a href="/new">
+            <button class="new-button" type="button">新規投稿</button>
+        </a>
+    </th:block>
 
     <div class="errorMessages" th:if="${errorMessages != null and !errorMessages.empty}">
         <ul>
@@ -69,13 +75,9 @@
             </div>
 
             <th:block th:if="${loginUser != null and loginUser.id == message.userId}">
-                <form th:action="@{/deleteMessage}" method="POST">
-                    <input type="hidden" name="message_id" th:value="${message.id}">
+                <form th:action="@{/deleteMessage/{id}(id=${message.id})}" th:method="delete">
+<!--                    <input type="hidden" name="message_id" th:value="${message.id}">-->
                     <button type="submit" class="delete-button">削除</button>
-                </form>
-                <form th:action="@{/edit}" method="GET">
-                    <input type="hidden" name="message_id" th:value="${message.id}">
-                    <button type="submit">編集</button>
                 </form>
             </th:block>
 
@@ -95,11 +97,6 @@
                     <span class="name" th:text="${comment.name}">コメント名前</span>
                     <div class="comment-text" th:text="${comment.content}">コメント内容</div>
                     <div class="comment-date" th:text="${#temporals.format(comment.createdDate, 'yyyy/MM/dd HH:mm:ss')}"></div>
-
-                    <div style="background-color: #f0f0f0; color: blue; font-size: 11px; padding: 5px; margin-top: 5px; border-radius: 3px;">
-                        🔑 あなたのログインID: <span th:text="${loginUser?.id}"></span> (型: <span th:text="${loginUser?.id?.getClass()?.getSimpleName()}"></span>) <br>
-                        📝 このコメントの投稿者ID: <span th:text="${comment.userId}"></span> (型: <span th:text="${comment.userId?.getClass()?.getSimpleName()}"></span>)
-                    </div>
 
                     <th:block th:if="${loginUser != null and loginUser.id == comment.userId}">
                         <form th:action="@{/comment/delete/{id}(id=${comment.id})}" th:method="delete" style="display: inline;">

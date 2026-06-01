@@ -62,8 +62,24 @@ public class UserService {
             userForm.setIsStopped(user.getIsStopped());
             userForm.setCreatedDate(user.getCreatedDate());
             userForm.setUpdatedDate(user.getUpdatedDate());
+            if (user.getBranch() != null) {
+                userForm.setBranchName(user.getBranch().getName());
+            }
+
+            if (user.getDepartment() != null) {
+                userForm.setDepartmentName(user.getDepartment().getName());
+            }
             userList.add(userForm);
         }
         return userList;
+    }
+
+    public List<UserForm> findAllUsers() {
+
+        List<User> results = userRepository.findAllByOrderByIdAsc();
+
+        log.info("[UserService] Found {} user for display.", results.size());
+
+        return setUserForm(results);
     }
 }
