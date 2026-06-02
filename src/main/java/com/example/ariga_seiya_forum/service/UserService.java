@@ -1,17 +1,20 @@
 package com.example.ariga_seiya_forum.service;
 
+import com.example.ariga_seiya_forum.controller.form.MessageForm;
 import com.example.ariga_seiya_forum.controller.form.UserForm;
+import com.example.ariga_seiya_forum.entity.Message;
 import com.example.ariga_seiya_forum.entity.User;
-import com.example.ariga_seiya_forum.exception.BadCredentialsException;
-import com.example.ariga_seiya_forum.exception.DisabledException;
+import com.example.ariga_seiya_forum.exception.*;
 import com.example.ariga_seiya_forum.repository.UserRepository;
 import com.example.ariga_seiya_forum.utils.CipherUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -24,7 +27,6 @@ public class UserService {
         log.info("[UserService] Initiating login authentication for account: {}.", account);
 
         String encryptedPassword = CipherUtil.encrypt(password);
-        //System.out.println(encryptedPassword);
         List<User> results = userRepository.findAllByAccountAndPassword(account, encryptedPassword);
 
         log.info("[UserService] Database search completed. Found {} records.", results.size());
@@ -81,5 +83,88 @@ public class UserService {
         log.info("[UserService] Found {} user for display.", results.size());
 
         return setUserForm(results);
+    }
+
+    @Transactional
+    public void changeStatus(Integer userId, Integer status) {
+
+        User user = userRepository.findById(userId).orElse(null);
+
+        if (user == null) {
+            throw new IllegalArgumentException("ユーザーが見つかりません。ID: " + userId);
+        }
+
+        user.setIsStopped(status);
+
+        log.info("[UserService] User ID: {}'s status has been changed to {}.", userId, status);
+
+        userRepository.save(user);
+    }
+
+    public void registerUser(UserForm userForm) {
+
+        if(!Objects.equals(userForm.getPassword(), userForm.getPasswordConfirm())){
+            log.warn("[UserService] Password and passwordConfirm do not match. account: {}", userForm.getAccount());
+
+            throw new PasswordMismatchException("Password mismatch");
+        }
+
+        List<User> existingUser = userRepository.findByAccount(userForm.getAccount());
+
+        if (!existingUser.isEmpty()) {
+            log.warn("[UserService] Account already exists. account: {}", userForm.getAccount());
+
+            throw new AccountDuplicateException("Account already in use");
+        }
+
+        Integer branch = userForm.getBranchId();
+        Integer department = userForm.getDepartmentId();
+
+        if (branch != null && department != null) {
+            if (branch == 1) {
+                if (department != 1 && department != 2) {
+                    log.warn("[UserService] Invalid department for HQ. departmentId: {}", department);
+                    throw new InvalidDepartmentException("Invalid branch and department combination");
+                }
+            } else {
+                if (department != 3 && department != 4) {
+                    log.warn("[UserService] Invalid department for Branch. departmentId: {}", department);
+                    throw new InvalidDepartmentException("Invalid branch and department combination");
+                }
+            }
+        }
+        saveUser(userForm);
+    }
+
+    /*
+     * 保存処理（新規登録・更新）
+     */
+    public void saveUser(UserForm reqForm) {
+
+        log.info("[UserService] Creating new user - Account: {}", reqForm.getAccount());
+
+        // Entityへの変換
+        User saveUser = setUserEntity(reqForm);
+
+        // DBへの保存実行
+        userRepository.save(saveUser);
+
+        // 2. 正常終了を記録
+        log.info("[UserService] Message save operation completed successfully.");
+    }
+
+    /*
+     * リクエストから取得した情報をEntityに設定
+     */
+    private User setUserEntity(UserForm reqForm){
+        log.info("[UserService] Converting Form to Entity - ID: {}", reqForm.getId());
+
+        User user = new User();
+        user.setAccount(reqForm.getAccount());
+        user.setPassword(reqForm.getPassword());
+        user.setBranchId(reqForm.getBranchId());
+        user.setDepartmentId(reqForm.getDepartmentId());
+        user.setName(reqForm.getName());
+        return user;
     }
 }

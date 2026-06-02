@@ -1,15 +1,16 @@
 package com.example.ariga_seiya_forum.controller;
 
-import com.example.ariga_seiya_forum.controller.form.CommentForm;
-import com.example.ariga_seiya_forum.controller.form.MessageForm;
-import com.example.ariga_seiya_forum.controller.form.UserForm;
+import com.example.ariga_seiya_forum.controller.form.*;
 import com.example.ariga_seiya_forum.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -62,4 +63,43 @@ public class UserManageController {
 
         return mav;
     }
+
+    @PostMapping("/user/change-status/{id}/{status}")
+    public ModelAndView changeStatus(
+            @PathVariable("id") Integer id,
+            @PathVariable("status") Integer status) {
+
+        log.info("[UserManageController] Received request to change status. UserID: {}, Target Status: {}", id, status);
+
+        try {
+            userService.changeStatus(id, status);
+
+            log.info("[UserManageController] Successfully changed status for UserID: {} to {}.", id, status);
+
+        } catch (Exception e) {
+            log.error("[UserManageController] Failed to change status for UserID: {}.", id, e);
+        }
+
+        return new ModelAndView("redirect:/user/management");
+    }
+
+    @GetMapping("/user/register")
+    public ModelAndView view(){
+
+        log.info("[UserManageController] Received request to display user register page.");
+
+        ModelAndView mav = new ModelAndView();
+
+        // form用の空のentityを準備
+        UserForm userForm = new UserForm();
+
+        // 画面遷移先を指定
+        mav.setViewName("signup");
+
+        // 準備した空のformを保管
+        mav.addObject("formModel", userForm);
+
+        return mav;
+    }
+
 }

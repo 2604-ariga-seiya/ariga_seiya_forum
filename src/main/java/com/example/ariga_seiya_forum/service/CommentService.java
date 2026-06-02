@@ -52,7 +52,6 @@ public class CommentService {
             commentForm.setUpdatedDate(comment.getUpdatedDate());
             commentForm.setUserId(comment.getUserId());
 
-            // 💡【追加】JPAで結合したUserから、ユーザー名とアカウントを抜いてFormに設定する
             if (comment.getUser() != null) {
                 commentForm.setName(comment.getUser().getName());       // ユーザー名
                 commentForm.setAccount(comment.getUser().getAccount()); // アカウント名
@@ -98,7 +97,7 @@ public class CommentService {
      * FormからEntityへの変換（保存準備）
      */
     private Comment setCommentEntity(CommentForm reqComment) {
-        // 変換の開始を記録。どのID（またはどの投稿への返信）を扱っているか出すと親切
+
         log.info("[CommentService] Converting Form to Entity - Message ID: {}", reqComment.getMessageId());
 
         Comment comment = new Comment();

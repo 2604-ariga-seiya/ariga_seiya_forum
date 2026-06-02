@@ -16,8 +16,7 @@
 
     <div class="header">
         <th:block th:if="${loginUser != null}">
-            <a th:href="@{/register/user}">ユーザー登録画面</a>
-            <a th:href="@{/edit/user}">ユーザー編集画面</a>
+            <a th:href="@{/user/register}">ユーザー登録画面</a>
             <a href="/top">戻る</a>
         </th:block>
     </div>
@@ -49,12 +48,13 @@
             <td th:text="${user.departmentName}"></td>
 
             <td>
-                <form th:if="${user.isStopped == 1}" th:action="@{/user/revive/{id}(id=${user.id})}" method="POST"
+                <a th:href="@{/user/edit/{id}(id=${user.id})}" class="btn-edit" style="margin-right: 10px;">編集</a>
+                <form th:if="${user.isStopped == 1}" th:action="@{/user/change-status/{id}/0(id=${user.id})}" method="POST"
                       onsubmit="return confirm('このユーザーを復活してもよろしいですか？');" style="display: inline;">
                     <button type="submit" class="btn-revive">復活</button>
                 </form>
 
-                <form th:if="${user.isStopped == 0}" th:action="@{/user/stop/{id}(id=${user.id})}" th:method="POST"
+                <form th:if="${user.isStopped == 0}" th:action="@{/user/change-status/{id}/1(id=${user.id})}" method="POST"
                       onsubmit="return confirm('このユーザーを停止してもよろしいですか？');" style="display: inline;">
                     <button type="submit" class="btn-suspend">停止</button>
                 </form>
