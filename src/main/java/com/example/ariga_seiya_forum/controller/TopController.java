@@ -98,6 +98,7 @@ public class TopController {
         mav.addObject("category", category);
         mav.addObject("messages", messageList);
         mav.addObject("comments", commentList);
+        mav.addObject("commentForm", new CommentForm());
 
         return mav;
     }

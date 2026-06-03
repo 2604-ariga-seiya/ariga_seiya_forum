@@ -27,7 +27,7 @@ public class UserManageController {
     @GetMapping("/user/management")
     public ModelAndView view(HttpSession session){
 
-        log.info("[UserManageController] Received request to display Home page.");
+        log.info("[UserManageController] Received request to display User Management page.");
 
         ModelAndView mav = new ModelAndView();
 
@@ -66,18 +66,41 @@ public class UserManageController {
 
     @PostMapping("/user/change-status/{id}/{status}")
     public ModelAndView changeStatus(
-            @PathVariable("id") Integer id,
-            @PathVariable("status") Integer status) {
+            @PathVariable String id,
+            RedirectAttributes redirectAttributes,
+            @PathVariable Integer status) {
 
         log.info("[UserManageController] Received request to change status. UserID: {}, Target Status: {}", id, status);
 
+        if (id == null || !id.matches("^[0-9]+$")) {
+            log.warn("[UserManageController] Invalid ID format: {}", id);
+            redirectAttributes.addFlashAttribute("errorMessage", "E0025");
+            return new ModelAndView("redirect:/user/management");
+        }
+
+        if (status == null || (status != 0 && status != 1)) {
+            log.warn("[UserManageController] Invalid status value received: {}", status);
+            redirectAttributes.addFlashAttribute("errorMessage", "E0025");
+            return new ModelAndView("redirect:/user/management");
+        }
+
+        int userId = Integer.parseInt(id);
+        UserForm userForm = userService.findUserById(userId);
+
+        if (userForm == null) {
+            log.warn("[UserManageController] Invalid edit access - UserID: {} does not exist.", id);
+            redirectAttributes.addFlashAttribute("errorMessage", "E0025");
+            return new ModelAndView("redirect:/user/management");
+        }
+
         try {
-            userService.changeStatus(id, status);
+            userService.changeStatus(userId, status);
 
             log.info("[UserManageController] Successfully changed status for UserID: {} to {}.", id, status);
 
         } catch (Exception e) {
             log.error("[UserManageController] Failed to change status for UserID: {}.", id, e);
+            redirectAttributes.addFlashAttribute("errorMessage", "E0025");
         }
 
         return new ModelAndView("redirect:/user/management");

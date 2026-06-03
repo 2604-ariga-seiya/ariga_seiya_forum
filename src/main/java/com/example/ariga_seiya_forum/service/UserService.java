@@ -1,8 +1,7 @@
 package com.example.ariga_seiya_forum.service;
 
-import com.example.ariga_seiya_forum.controller.form.MessageForm;
 import com.example.ariga_seiya_forum.controller.form.UserForm;
-import com.example.ariga_seiya_forum.entity.Message;
+import com.example.ariga_seiya_forum.controller.form.UserUpdateForm;
 import com.example.ariga_seiya_forum.entity.User;
 import com.example.ariga_seiya_forum.exception.*;
 import com.example.ariga_seiya_forum.repository.UserRepository;
@@ -119,6 +118,7 @@ public class UserService {
 
         Integer branch = userForm.getBranchId();
         Integer department = userForm.getDepartmentId();
+        userForm.setIsStopped(0);
 
         if (branch != null && department != null) {
             if (branch == 1) {
@@ -137,7 +137,7 @@ public class UserService {
     }
 
     /*
-     * 保存処理（新規登録・更新）
+     * 保存処理（新規登録）
      */
     public void saveUser(UserForm reqForm) {
 
@@ -150,7 +150,7 @@ public class UserService {
         userRepository.save(saveUser);
 
         // 2. 正常終了を記録
-        log.info("[UserService] Message save operation completed successfully.");
+        log.info("[UserService] User save operation completed successfully.");
     }
 
     /*
@@ -165,6 +165,109 @@ public class UserService {
         user.setBranchId(reqForm.getBranchId());
         user.setDepartmentId(reqForm.getDepartmentId());
         user.setName(reqForm.getName());
+        user.setIsStopped(reqForm.getIsStopped());
+        return user;
+    }
+
+    /*
+     * ユーザーを1つ取得
+     */
+    public UserForm findUserById(Integer id) {
+
+        log.info("[UserService] Attempting to find user by ID: {}", id);
+
+        List<User> results = new ArrayList<>();
+        User user = userRepository.findById(id).orElse(null);
+
+        if (user == null) {
+            log.warn("[UserService] User not found - UserID: {}", id);
+            return null;
+        }
+
+        log.info("[UserService] User successfully retrieved from database. Title: {}", user.getAccount());
+
+        results.add(user);
+        List<UserForm> userList = setUserForm(results);
+
+        return userList.get(0);
+    }
+
+    /*
+     * 保存処理（更新）
+     */
+    public void updateUser(UserUpdateForm userUpdateForm) {
+
+        log.info("[UserService] Updating existing User - ID: {}, Content: {}",
+                userUpdateForm.getId(), userUpdateForm.getAccount());
+
+        boolean exists = userRepository.existsById(userUpdateForm.getId());
+        if (!exists) {
+            log.warn("[UserService] Update failed. User ID: {} does not exist.", userUpdateForm.getId());
+            throw new IllegalArgumentException("User ID " + userUpdateForm.getId() + " not found.");
+        }
+
+        if(!Objects.equals(userUpdateForm.getPassword(), userUpdateForm.getPasswordConfirm())){
+            log.warn("[UserService] Password and passwordConfirm do not match. account: {}", userUpdateForm.getAccount());
+
+            throw new PasswordMismatchException("Password mismatch");
+        }
+
+        List<User> existingUser = userRepository.findByAccountAndIdNot(userUpdateForm.getAccount(), userUpdateForm.getId());
+
+        if (!existingUser.isEmpty()) {
+            log.warn("[UserService] Account already exists. account: {}", userUpdateForm.getAccount());
+
+            throw new AccountDuplicateException("Account already in use");
+        }
+
+        Integer branch = userUpdateForm.getBranchId();
+        Integer department = userUpdateForm.getDepartmentId();
+
+        if (branch != null && department != null) {
+            if (branch == 1) {
+                if (department != 1 && department != 2) {
+                    log.warn("[UserService] Invalid department for HQ. departmentId: {}", department);
+                    throw new InvalidDepartmentException("Invalid branch and department combination");
+                }
+            } else {
+                if (department != 3 && department != 4) {
+                    log.warn("[UserService] Invalid department for Branch. departmentId: {}", department);
+                    throw new InvalidDepartmentException("Invalid branch and department combination");
+                }
+            }
+        }
+
+        User updateUser = setUserEntity(userUpdateForm);
+
+        userRepository.save(updateUser);
+
+        log.info("[UserService] User update operation completed successfully.");
+    }
+
+    private User setUserEntity(UserUpdateForm userUpdateForm) {
+        User user = new User();
+        user.setId(userUpdateForm.getId());
+        user.setAccount(userUpdateForm.getAccount());
+
+        if (userUpdateForm.getPassword() == null || userUpdateForm.getPassword().isEmpty()) {
+            log.info("[UserService] Password is empty. Keep current password.");
+
+            User currentUser = userRepository.findById(userUpdateForm.getId()).orElse(null);
+
+            if(currentUser == null){
+                throw new IllegalArgumentException("User ID not found: " + userUpdateForm.getId());
+            }
+            user.setPassword(currentUser.getPassword());
+
+        } else {
+            user.setPassword(CipherUtil.encrypt(userUpdateForm.getPassword()));
+        }
+
+        user.setName(userUpdateForm.getName());
+        user.setBranchId(userUpdateForm.getBranchId());
+        user.setDepartmentId(userUpdateForm.getDepartmentId());
+        user.setIsStopped(userUpdateForm.getIsStopped());
+
         return user;
     }
 }

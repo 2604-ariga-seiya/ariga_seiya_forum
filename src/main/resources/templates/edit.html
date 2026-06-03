@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>ユーザー編集画面</title>
+    <link th:href="@{/css/style.css}" rel="styleSheet">
+</head>
+<body>
+
+<h2>ユーザー編集画面</h2>
+<div class="main-contents">
+
+    <div th:if="${errorMessage}" style="color: red; font-weight: bold; margin-bottom: 10px;">
+        <p th:text="#{${errorMessage}}"></p>
+    </div>
+
+    <div th:if="${not #lists.isEmpty(errorMessages)}" class="errorMessages">
+        <ul>
+            <li th:each="errorMessage : ${errorMessages}" th:text="${errorMessage}"
+                style="color: red; font-weight: bold; margin-bottom: 10px;"></li>
+        </ul>
+    </div>
+
+    <form th:action="@{/user/update/{id}(id=${formModel.id})}" th:object="${formModel}" th:method="put"> <br />
+        <input type="hidden" th:field="*{isStopped}" />
+        <label for="name">名前</label>
+        <input type="text" name="name" id="name" th:field="*{name}"/> <br />
+
+        <label for="account">アカウント名</label>
+        <input type="text" name="account" id="account" th:field="*{account}"/> <br />
+
+        <label for="password">パスワード</label>
+        <input name="password" type="password" id="password" th:field="*{password}"/> <br />
+
+        <label for="passwordConfirm">パスワード確認用</label>
+        <input name="passwordConfirm" type="password" id="passwordConfirm" /> <br />
+
+        <label for="branchId">支社</label>
+        <select name="branchId" id="branchId" th:field="*{branchId}">
+            <option value="" selected hidden>-- 選択してください --</option>
+            <option value="1">本社</option>
+            <option value="2">A支社</option>
+            <option value="3">B支社</option>
+            <option value="4">C支社</option>
+        </select> <br />
+
+        <label for="departmentId">部署</label>
+        <select name="departmentId" id="departmentId" th:field="*{departmentId}">
+            <option value="" selected hidden>-- 選択してください --</option>
+            <option value="1">総務人事部</option>
+            <option value="2">情報管理部</option>
+            <option value="3">営業部</option>
+            <option value="4">技術部</option>
+        </select> <br />
+
+        <input type="submit" value="編集" /> <br />
+
+        <a th:href="@{/user/management}">戻る</a>
+    </form>
+
+    <div class="copyright">Copyright(c)Your Name</div>
+</div>
+</body>
+</html>

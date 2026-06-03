@@ -11,7 +11,7 @@
     <h1>ユーザー管理画面</h1>
 
     <div th:if="${errorMessage}" class="alert alert-danger" style="color: red; font-weight: bold;">
-        <p th:text="${errorMessage}"></p>
+        <p th:text="#{${errorMessage}}"></p>
     </div>
 
     <div class="header">

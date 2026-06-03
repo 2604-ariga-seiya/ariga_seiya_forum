@@ -2,6 +2,7 @@ package com.example.ariga_seiya_forum.controller;
 
 import com.example.ariga_seiya_forum.controller.form.LoginForm;
 import com.example.ariga_seiya_forum.controller.form.UserForm;
+import com.example.ariga_seiya_forum.exception.AccountDuplicateException;
 import com.example.ariga_seiya_forum.exception.InvalidDepartmentException;
 import com.example.ariga_seiya_forum.exception.PasswordMismatchException;
 import com.example.ariga_seiya_forum.service.UserService;
@@ -29,8 +30,7 @@ public class SignUpController {
     @PostMapping("/signup")
     public ModelAndView signUpUser(
             @Validated @ModelAttribute("formModel") UserForm userForm,
-            BindingResult result,
-            HttpSession session){
+            BindingResult result){
 
         log.info("[SignUpController] Signup request received. Account: {}", userForm.getAccount());
 
@@ -65,6 +65,13 @@ public class SignUpController {
             log.warn("[SignUpController] SignUp failed for account: {}. Reason: {}", userForm.getAccount(), e.getMessage());
 
             mav.addObject("errorMessage", "E0023");
+
+            mav.setViewName("signup");
+            return mav;
+        } catch (AccountDuplicateException e){
+            log.warn("[SignUpController] SignUp failed for account: {}. Reason: {}", userForm.getAccount(), e.getMessage());
+
+            mav.addObject("errorMessage", "E0015");
 
             mav.setViewName("signup");
             return mav;

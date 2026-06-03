@@ -30,7 +30,7 @@ public class User {
     private Integer departmentId;
 
     @Column(nullable = false)
-    private Integer isStopped = 0;
+    private Integer isStopped;
 
     @Column(name = "created_date", nullable = false, insertable = false, updatable = false)
     private LocalDateTime createdDate;
