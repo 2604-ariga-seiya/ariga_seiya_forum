@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -68,7 +69,7 @@ public class UserManageController {
     public ModelAndView changeStatus(
             @PathVariable String id,
             RedirectAttributes redirectAttributes,
-            @PathVariable Integer status) {
+            @PathVariable String status) {
 
         log.info("[UserManageController] Received request to change status. UserID: {}, Target Status: {}", id, status);
 
@@ -78,11 +79,13 @@ public class UserManageController {
             return new ModelAndView("redirect:/user/management");
         }
 
-        if (status == null || (status != 0 && status != 1)) {
+        if (status == null || !status.matches("[0-1]")) {
             log.warn("[UserManageController] Invalid status value received: {}", status);
             redirectAttributes.addFlashAttribute("errorMessage", "E0025");
             return new ModelAndView("redirect:/user/management");
         }
+
+        Integer statusInt = Integer.parseInt(status);
 
         int userId = Integer.parseInt(id);
         UserForm userForm = userService.findUserById(userId);
@@ -94,7 +97,7 @@ public class UserManageController {
         }
 
         try {
-            userService.changeStatus(userId, status);
+            userService.changeStatus(userId, statusInt);
 
             log.info("[UserManageController] Successfully changed status for UserID: {} to {}.", id, status);
 

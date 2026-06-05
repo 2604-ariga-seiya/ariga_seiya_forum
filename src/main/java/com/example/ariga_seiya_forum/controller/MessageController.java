@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.Objects;
+
 
 @Slf4j
 @Controller
@@ -77,8 +79,11 @@ public class MessageController {
         mav.setViewName("redirect:/top");
         return mav;
     }
+
     @DeleteMapping("/deleteMessage/{id}")
-    public ModelAndView deleteMessage(@PathVariable String id, RedirectAttributes redirectAttributes){
+    public ModelAndView deleteMessage(
+            @PathVariable String id, RedirectAttributes redirectAttributes,
+            HttpSession session){
         log.info("[MessageController] Received request to delete task - ID: {}", id);
 
         if (id == null || !id.matches("^[0-9]+$")) {
@@ -87,7 +92,6 @@ public class MessageController {
             return new ModelAndView("redirect:/");
         }
 
-
         int messageId = Integer.parseInt(id);
         MessageForm messageForm = messageService.findMessageById(messageId);
 
@@ -95,6 +99,16 @@ public class MessageController {
             log.warn("[MessageController] Invalid delete access - MessageID: {} does not exist.", id);
             redirectAttributes.addFlashAttribute("errorMessage", "E0025");
             // rootへリダイレクト
+            return new ModelAndView("redirect:/top");
+        }
+
+        UserForm loginUser = (UserForm) session.getAttribute("loginUser");
+
+        if (loginUser == null || !Objects.equals(messageForm.getUserId(), loginUser.getId())) {
+            log.warn("[MessageController] Unauthorized delete attempt! UserID: {} tried to delete MessageID: {} (OwnerID: {})",
+                    loginUser != null ? loginUser.getId() : "Guest", messageId, messageForm.getUserId());
+
+            redirectAttributes.addFlashAttribute("errorMessage", "E0025");
             return new ModelAndView("redirect:/top");
         }
 

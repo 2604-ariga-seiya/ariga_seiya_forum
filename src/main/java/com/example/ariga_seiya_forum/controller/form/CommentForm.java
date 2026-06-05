@@ -1,6 +1,7 @@
 package com.example.ariga_seiya_forum.controller.form;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -12,6 +13,7 @@ public class CommentForm {
     @NotBlank(message = "{E0004}")
     @Size(max = 500, message = "{E0005}")
     private String content;
+    @NotNull(message = "{E0025}")
     private Integer messageId;
     private Integer userId;
     private String name;    // ユーザー名（users.name）用

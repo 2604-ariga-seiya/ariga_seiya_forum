@@ -24,8 +24,12 @@ public class UserForm {
     @Size(max = 10, message = "{E0020}")
     private String name;
     @NotNull(message = "{E0021}")
+    @Min(value = 1, message = "{E0025}")
+    @Max(value = 4, message = "{E0025}")
     private Integer branchId;
     @NotNull(message = "{E0022}")
+    @Min(value = 1, message = "{E0025}")
+    @Max(value = 4, message = "{E0025}")
     private Integer departmentId;
     private Integer isStopped;
     private LocalDateTime createdDate;

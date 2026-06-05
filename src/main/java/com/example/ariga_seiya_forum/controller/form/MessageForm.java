@@ -16,7 +16,7 @@ public class MessageForm {
     @Size(max = 1000, message = "{E0010}")
     private String content;
     @NotBlank(message = "{E0008}")
-    @Size(max = 1000, message = "{E0011}")
+    @Size(max = 10, message = "{E0011}")
     private String category;
     private Integer userId;
     private String name;    // ユーザー名（users.name）用

@@ -1,7 +1,6 @@
 package com.example.ariga_seiya_forum.controller.form;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 
 @Data
@@ -22,7 +21,15 @@ public class UserUpdateForm {
 
     private String passwordConfirm;
 
+    @NotNull(message = "{E0021}")
+    @Min(value = 1, message = "{E0025}")
+    @Max(value = 4, message = "{E0025}")
     private Integer branchId;
+
+    @NotNull(message = "{E0022}")
+    @Min(value = 1, message = "{E0025}")
+    @Max(value = 4, message = "{E0025}")
     private Integer departmentId;
+
     private Integer isStopped;
 }

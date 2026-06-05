@@ -72,7 +72,8 @@ public class TopController {
     public ModelAndView categorize(
             @RequestParam(name = "startDate", required = false) String startStr,
             @RequestParam(name = "endDate", required = false) String endStr,
-            @RequestParam(name = "category", required = false) String category){
+            @RequestParam(name = "category", required = false) String category,
+            HttpSession session){
 
         log.info("[TopController] Received request to search. start: {}, end: {}, category: {}", startStr, endStr, category);
 
@@ -99,6 +100,7 @@ public class TopController {
         mav.addObject("messages", messageList);
         mav.addObject("comments", commentList);
         mav.addObject("commentForm", new CommentForm());
+        mav.addObject("loginUser", session.getAttribute("loginUser"));
 
         return mav;
     }

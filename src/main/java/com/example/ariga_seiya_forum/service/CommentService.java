@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,19 +74,12 @@ public class CommentService {
             throw new IllegalArgumentException("Message ID " + reqComment.getMessageId() + " not found.");
         }
 
-        // IDが0なら新規(Create)、それ以外なら更新(Update)としてログを出し分ける
-        if (reqComment.getId() == null) {
-            log.info("[CommentService] Creating new comment - Message ID: {}, Content: {}",
-                    reqComment.getMessageId(), reqComment.getContent());
-        } else {
-            log.info("[CommentService] Updating existing comment - CommentID: {}, Content: {}",
-                    reqComment.getId(), reqComment.getContent());
-        }
+        log.info("[CommentService] Creating new comment - Message ID: {}, Content: {}",
+                reqComment.getMessageId(), reqComment.getContent());
+
 
         Comment saveComment = setCommentEntity(reqComment);
         commentRepository.save(saveComment);
-
-        log.info("[CommentService] Updated lastCommentedAt for Message ID: {}", message.getId());
 
         // データベースへの保存命令が完了したことを記録
         log.info("[CommentService] Save operation completed successfully.");
@@ -119,5 +111,28 @@ public class CommentService {
         commentRepository.deleteById(id);
 
         log.info("[CommentService] Delete completed successfully - CommentID: {}", id);
+    }
+
+    /*
+     * 投稿を1件取得
+     */
+    public CommentForm findCommentById(Integer id) {
+
+        log.info("[CommentService] Attempting to find comment by ID: {}", id);
+
+        List<Comment> results = new ArrayList<>();
+        Comment comment = commentRepository.findById(id).orElse(null);
+
+        if (comment == null) {
+            log.warn("[CommentService] Comment not found - CommentID: {}", id);
+            return null;
+        }
+
+        log.info("[CommentService] Comment successfully retrieved from database. Title: {}", comment.getId());
+
+        results.add(comment);
+        List<CommentForm> commentList = setCommentForm(results);
+
+        return commentList.get(0);
     }
 }

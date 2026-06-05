@@ -1,12 +1,10 @@
 package com.example.ariga_seiya_forum.controller;
 
-import com.example.ariga_seiya_forum.controller.form.LoginForm;
 import com.example.ariga_seiya_forum.controller.form.UserForm;
 import com.example.ariga_seiya_forum.exception.AccountDuplicateException;
 import com.example.ariga_seiya_forum.exception.InvalidDepartmentException;
 import com.example.ariga_seiya_forum.exception.PasswordMismatchException;
 import com.example.ariga_seiya_forum.service.UserService;
-import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

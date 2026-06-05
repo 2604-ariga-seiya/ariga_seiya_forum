@@ -8,6 +8,6 @@ public class LoginForm {
     @NotBlank(message = "{E0001}")
     private String account;
 
-    @NotBlank(message = "{E0001}")
+    @NotBlank(message = "{E0002}")
     private String password;
 }

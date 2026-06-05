@@ -1,59 +1,62 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>掲示板</title>
     <link th:href="@{/css/style.css}" rel="styleSheet">
 </head>
 <body>
-<h2>掲示板</h2>
+<div class="header-contents">
+    <h2>掲示板</h2>
 
-<div class="comment-error-area" style="color: red; font-weight: bold; margin-bottom: 10px;">
+    <div class="comment-error-area" style="color: red; font-weight: bold; margin-bottom: 10px;">
 
-    <th:block th:if="${#fields != null and #fields.hasErrors('commentForm.content')}">
-        <p th:text="${#fields.errors('commentForm.content')[0]}"></p>
-    </th:block>
+        <th:block th:if="${#fields != null and #fields.hasErrors('commentForm.content')}">
+            <p th:text="${#fields.errors('commentForm.content')[0]}"></p>
+        </th:block>
 
-    <p th:if="${errorMessage}" th:text="#{${errorMessage}}"></p>
+        <p th:if="${errorMessage}" th:text="#{${errorMessage}}"></p>
 
-</div>
-
-<form th:action="@{/search}" method="get">
-    <div class="filter-area">
-        <label for="startDate">期間:</label>
-        <input type="date" id="startDate" name="startDate" th:value="${startDate}">
-
-        <span> ～ </span>
-
-        <input type="date" id="endDate" name="endDate" th:value="${endDate}">
-        <input type="text" id="category" name="category" th:value="${category}">
-        <button type="submit">絞り込み</button>
     </div>
-</form>
 
-<div class="profile" th:if="${loginUser != null}">
-    <div class="name">
-        <span th:text="${loginUser.name}">ユーザー名</span>
+    <div class="menu-bar" style="padding: 10px 20px; display: flex; gap: 20px; align-items: center; border-radius: 5px; margin-bottom: 20px;">
+
+        <a href="/new">新規投稿</a>
+
+        <a th:if="${loginUser.departmentId == 1}" th:href="@{/user/management}">ユーザー管理</a>
+
+        <div class="user-profile" th:if="${loginUser != null}">
+            <div class="user-info">
+                <span class="user-name" th:text="${loginUser.name}">ユーザー名</span>
+                <span class="user-account">@<span th:text="${loginUser.account}">account</span></span>
+            </div>
+            <a th:href="@{/logout}" class="btn-logout">ログアウト</a>
+        </div>
     </div>
-    <div class="account">
-        @<span th:text="${loginUser.account}">アカウント</span>
-    </div>
+
+    <form th:action="@{/search}" method="get" class="search-form">
+        <div class="filter-area">
+
+            <div class="filter-group">
+                <label for="startDate">期間:</label>
+                <input type="date" id="startDate" name="startDate" th:value="${startDate}">
+                <span class="range-separator">～</span>
+                <input type="date" id="endDate" name="endDate" th:value="${endDate}">
+            </div>
+
+            <div class="filter-group">
+                <label for="category">カテゴリ:</label>
+                <input type="text" id="category" name="category" th:value="${category}">
+            </div>
+
+            <button type="submit" class="btn-search">絞り込み</button>
+
+        </div>
+    </form>
+
 </div>
 
 <div class="main-contents">
-
-    <div class="header">
-        <th:block th:if="${loginUser != null}">
-            <a th:if="${loginUser.id == 1}" th:href="@{/user/management}">ユーザー管理画面</a>
-            <a th:href="@{/logout}">ログアウト</a>
-        </th:block>
-    </div>
-
-    <th:block th:if="${loginUser != null}">
-        <a href="/new">
-            <button class="new-button" type="button">新規投稿</button>
-        </a>
-    </th:block>
 
     <div class="errorMessages" th:if="${errorMessages != null and !errorMessages.empty}">
         <ul>
@@ -65,23 +68,29 @@
         <article class="post-card" th:each="message : ${messages}">
 
             <div class="message">
-                <div class="name">
-                    <span class="name" th:text="${message.name}">名前</span>
+                <div class="message-header">
+                    <strong>
+                        <span class="name" th:text="${message.name}">名前</span>
+                    </strong>
+                    <span class="account">
+                    @<span th:text="${message.account}">アカウント</span>
+                </span>
+                    <span class="message-date" th:text="${#temporals.format(message.createdDate, 'yyyy/MM/dd HH:mm:ss')}"></span>
                 </div>
-                <div class="category" th:text="${message.category}">カテゴリー</div>
+
                 <div class="title" th:text="${message.title}">件名</div>
                 <div class="text" th:text="${message.content}">つぶやき内容</div>
-                <span th:text="${#temporals.format(message.createdDate, 'yyyy/MM/dd HH:mm:ss')}"></span>
+                <div class="category" th:text="${message.category}">カテゴリー</div>
             </div>
 
             <th:block th:if="${loginUser != null and loginUser.id == message.userId}">
-                <form th:action="@{/deleteMessage/{id}(id=${message.id})}" th:method="delete">
-<!--                    <input type="hidden" name="message_id" th:value="${message.id}">-->
+                <form th:action="@{/deleteMessage/{id}(id=${message.id})}" th:method="delete"
+                      onsubmit="return confirm('この投稿を削除してもよろしいですか？');">
                     <button type="submit" class="delete-button">削除</button>
                 </form>
             </th:block>
 
-            <form th:action="@{/comment}" method="post">
+            <form th:action="@{/comment}" method="post" style="margin-top: 10px;">
                 返信<br />
                 <textarea name="content" cols="100" rows="5" class="comment"></textarea>
                 <br />
@@ -91,28 +100,32 @@
 
             <th:block th:each="comment : ${comments}">
                 <div class="comment-item" th:if="${comment.messageId == message.id}">
-                    <span class="comment-account-name">
-                        <a th:href="@{./(user_id=${comment.userId})}" th:text="${comment.account}">コメントアカウント</a>
+
+                    <div class="comment-header">
+                        <strong>
+                            <span class="name" th:text="${comment.name}">コメント名前</span>
+                        </strong>
+                        <span class="comment-account">
+                        @<span th:text="${comment.account}">コメントアカウント</span>
                     </span>
-                    <span class="name" th:text="${comment.name}">コメント名前</span>
+                        <span class="comment-date" th:text="${#temporals.format(comment.createdDate, 'yyyy/MM/dd HH:mm:ss')}"></span>
+                    </div>
+
                     <div class="comment-text" th:text="${comment.content}">コメント内容</div>
-                    <div class="comment-date" th:text="${#temporals.format(comment.createdDate, 'yyyy/MM/dd HH:mm:ss')}"></div>
 
                     <th:block th:if="${loginUser != null and loginUser.id == comment.userId}">
-                        <form th:action="@{/comment/delete/{id}(id=${comment.id})}" th:method="delete" style="display: inline;">
+                        <form th:action="@{/comment/delete/{id}(id=${comment.id})}" th:method="delete" style="display: inline;"
+                              onsubmit="return confirm('この返信を削除してもよろしいですか？');">
                             <input type="hidden" name="comment_id" th:value="${comment.id}">
                             <button type="submit" class="delete-button">削除</button>
                         </form>
                     </th:block>
-
                 </div>
             </th:block>
-
 
         </article>
     </div>
 
-    <div class="copyright">Copyright(c)seiya ariga</div>
 </div>
 </body>
 </html>

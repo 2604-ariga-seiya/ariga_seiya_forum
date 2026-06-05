@@ -5,6 +5,7 @@ import com.example.ariga_seiya_forum.controller.form.UserForm;
 import com.example.ariga_seiya_forum.exception.BadCredentialsException;
 import com.example.ariga_seiya_forum.exception.DisabledException;
 import com.example.ariga_seiya_forum.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +29,17 @@ public class LoginController {
      * ログイン画面表示処理
      */
     @GetMapping("/login")
-    public ModelAndView view(){
+    public ModelAndView view(HttpServletRequest request){
 
         log.info("[LoginController] Received request to display login page.");
 
         ModelAndView mav = new ModelAndView();
+
+        HttpSession session = request.getSession(false);
+        if (session != null && session.getAttribute("errorMessage") != null) {
+            mav.addObject("errorMessage", session.getAttribute("errorMessage"));
+            session.removeAttribute("errorMessage");
+        }
 
         // form用の空のentityを準備
         LoginForm loginForm = new LoginForm();

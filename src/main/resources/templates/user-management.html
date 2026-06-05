@@ -8,7 +8,7 @@
 <body>
 
 <div class="header-contents">
-    <h1>ユーザー管理画面</h1>
+    <h2>ユーザー管理画面</h2>
 
     <div th:if="${errorMessage}" class="alert alert-danger" style="color: red; font-weight: bold;">
         <p th:text="#{${errorMessage}}"></p>
@@ -38,11 +38,11 @@
         </thead>
         <tbody>
         <tr th:each="user : ${userList}">
-            <td th:text="${user.id}"></td>
+            <td th:text="${user.id}" style="text-align: center;"></td>
             <td th:text="${user.account}"></td>
             <td th:text="${user.name}"></td>
-            <td th:text="${user.branchId}"></td>
-            <td th:text="${user.departmentId}"></td>
+            <td th:text="${user.branchId}" style="text-align: center;"></td>
+            <td th:text="${user.departmentId}" style="text-align: center;"></td>
             <td th:text="${user.isStopped == 1 ? '停止中' : '稼働中'}"></td>
             <td th:text="${user.branchName}"></td>
             <td th:text="${user.departmentName}"></td>

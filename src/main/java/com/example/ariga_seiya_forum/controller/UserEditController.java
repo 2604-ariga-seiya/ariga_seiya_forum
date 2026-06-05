@@ -114,7 +114,7 @@ public class UserEditController {
 
             mav.addObject("errorMessage", "E0023");
 
-            mav.setViewName("signup");
+            mav.setViewName("edit");
             return mav;
         } catch (AccountDuplicateException e){
             log.warn("[SignUpController] SignUp failed for account: {}. Reason: {}", userUpdateForm.getAccount(), e.getMessage());

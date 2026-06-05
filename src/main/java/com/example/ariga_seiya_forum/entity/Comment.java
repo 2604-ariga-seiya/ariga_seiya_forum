@@ -21,10 +21,10 @@ public class Comment {
     @Column(name = "user_id")
     private Integer userId;
 
-    @Column(name = "created_date")
+    @Column(name = "created_date", nullable = false, insertable = false, updatable = false)
     private LocalDateTime createdDate;
 
-    @Column(name = "updated_date")
+    @Column(name = "updated_date", nullable = false, insertable = false, updatable = false)
     private LocalDateTime updatedDate;
 
     @ManyToOne
