@@ -1,7 +1,6 @@
 package com.example.ariga_seiya_forum.controller;
 
 import com.example.ariga_seiya_forum.controller.form.CommentForm;
-import com.example.ariga_seiya_forum.controller.form.MessageForm;
 import com.example.ariga_seiya_forum.controller.form.UserForm;
 import com.example.ariga_seiya_forum.service.CommentService;
 import com.example.ariga_seiya_forum.service.MessageService;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.List;
 import java.util.Objects;
 
 @Slf4j

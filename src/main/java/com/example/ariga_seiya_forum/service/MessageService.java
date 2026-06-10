@@ -94,7 +94,7 @@ public class MessageService {
         if (category == null || category.isBlank()) {
             results = messageRepository.findAllByCreatedDateBetween(start, end, pageable);
         } else {
-            results = messageRepository.findAllByCreatedDateBetweenAndCategory(start, end, category, pageable);
+            results = messageRepository.findAllByCreatedDateBetweenAndCategoryContaining(start, end, category, pageable);
         }
 
         log.info("[MessageService] Found {} message for display.", results.size());
