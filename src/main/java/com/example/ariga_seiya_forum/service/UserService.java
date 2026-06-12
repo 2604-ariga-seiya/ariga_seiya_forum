@@ -26,6 +26,7 @@ public class UserService {
         log.info("[UserService] Initiating login authentication for account: {}.", account);
 
         String encryptedPassword = CipherUtil.encrypt(password);
+        System.out.println(encryptedPassword);
         List<User> results = userRepository.findAllByAccountAndPassword(account, encryptedPassword);
 
         log.info("[UserService] Database search completed. Found {} records.", results.size());
@@ -133,6 +134,8 @@ public class UserService {
                 }
             }
         }
+        userForm.setPassword(CipherUtil.encrypt(userForm.getPassword()));
+
         saveUser(userForm);
     }
 
@@ -184,7 +187,7 @@ public class UserService {
             return null;
         }
 
-        log.info("[UserService] User successfully retrieved from database. Title: {}", user.getAccount());
+        log.info("[UserService] User successfully retrieved from database. Account: {}", user.getAccount());
 
         results.add(user);
         List<UserForm> userList = setUserForm(results);

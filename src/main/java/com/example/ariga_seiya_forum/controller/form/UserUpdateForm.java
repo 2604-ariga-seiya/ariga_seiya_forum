@@ -13,10 +13,10 @@ public class UserUpdateForm {
     private String name;
 
     @NotBlank(message = "{E0013}")
-    @Size(min = 6, max = 20, message = "{E0014}")
+    @Pattern(regexp = "^[a-zA-Z0-9]{6,20}$", message = "{E0014}")
     private String account;
 
-    @Size(max = 20, message = "{E0017}")
+    @Pattern(regexp = "^[\\x20-\\x7e]{6,20}$", message = "{E0017}")
     private String password;
 
     private String passwordConfirm;

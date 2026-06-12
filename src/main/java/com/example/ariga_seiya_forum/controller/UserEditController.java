@@ -106,7 +106,7 @@ public class UserEditController {
 
             mav.addObject("errorMessage", "E0018");
 
-            mav.setViewName("signup");
+            mav.setViewName("edit");
             return mav;
 
         } catch (InvalidDepartmentException e){
@@ -121,8 +121,9 @@ public class UserEditController {
 
             mav.addObject("errorMessage", "E0015");
 
-            mav.setViewName("signup");
+            mav.setViewName("edit");
             return mav;
+
         } catch (IllegalArgumentException e){
             log.warn("[UserEditController] Update failed. Internal error: {}", e.getMessage());
 
